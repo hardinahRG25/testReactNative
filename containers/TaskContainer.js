@@ -11,7 +11,7 @@ const TaskContainer = () => {
   const [showCompleted, setShowCompleted] = useState(true);
   const [sortOrder, setSortOrder] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
-  const [darkMode, setDarkMode] = useState(false); // État pour le mode sombre
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     axios
@@ -146,7 +146,7 @@ const TaskContainer = () => {
             onDelete={deleteTask}
             onComplete={completeTask}
             onEdit={editTask}
-            darkMode={darkMode} // Passer le mode sombre à TaskItem
+            darkMode={darkMode}
           />
         )}
         keyExtractor={(item) => item.id.toString()}
@@ -171,26 +171,26 @@ const TaskContainer = () => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingVertical: 10, // Ajustez la marge ici
+    paddingVertical: 80,
     flex: 1,
   },
   containerLight: {
-    backgroundColor: '#E9F7EF', // Couleur de fond claire
+    backgroundColor: '#E9F7EF',
   },
   containerDark: {
-    backgroundColor: '#2C3E50', // Couleur de fond sombre
+    backgroundColor: '#2C3E50',
   },
   header: {
     fontSize: 32,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 10, // Réduit l'espace entre l'en-tête et le champ de recherche
+    marginBottom: 10,
   },
   headerLight: {
     color: '#2C3E50',
   },
   headerDark: {
-    color: '#ECF0F1', // Couleur du texte dans le mode sombre
+    color: '#ECF0F1',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   inputDark: {
     borderColor: '#ECF0F1',
     backgroundColor: '#34495E',
-    color: '#ECF0F1', // Couleur du texte en mode sombre
+    color: '#ECF0F1',
   },
   menuButton: {
     marginLeft: 10,
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     color: '#007BFF',
   },
   menuTextDark: {
-    color: '#ECF0F1', // Couleur du texte dans le menu sombre
+    color: '#ECF0F1',
   },
   taskList: {
     flex: 1,

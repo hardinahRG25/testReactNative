@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Importer FontAwesome
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const TaskItem = ({ task, onDelete, onComplete, onEdit }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   taskText: {
     fontSize: 18,
     flex: 1,
-    marginLeft: 10, // Ajouter un espace après le check
+    marginLeft: 10,
   },
   completedTask: {
     textDecorationLine: 'line-through',
