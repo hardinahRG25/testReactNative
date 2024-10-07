@@ -40,3 +40,7 @@ npm install
 ```bash
 npx expo start
 ```
+
+## illustration
+
+![Texte alternatif pour l'image](assets/Screenshot_20241007-204001.png)
