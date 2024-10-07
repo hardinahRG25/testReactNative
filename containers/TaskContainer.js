@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E9F7EF',
   },
   containerDark: {
-    backgroundColor: '#2C3E50',
+    backgroundColor: '#b2c5d8',
   },
   header: {
     fontSize: 32,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   },
   inputDark: {
     borderColor: '#ECF0F1',
-    backgroundColor: '#34495E',
+    backgroundColor: 'white',
     color: '#ECF0F1',
   },
   menuButton: {
