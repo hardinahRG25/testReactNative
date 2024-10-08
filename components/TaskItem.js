@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, Pressable } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const TaskItem = ({ task, onDelete, onComplete, onEdit }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState(task.title);
+  const [showModal, setShowModal] = useState(false);
 
   const handleEdit = () => {
     if (isEditing) {
@@ -13,9 +14,21 @@ const TaskItem = ({ task, onDelete, onComplete, onEdit }) => {
     setIsEditing(!isEditing);
   };
 
+  const handleDeletePress = () => {
+    setShowModal(true); // Show the modal
+  };
+
+  const confirmDelete = () => {
+    setShowModal(false); // Close the modal
+    onDelete(task.id); // Delete the task
+  };
+
+  const cancelDelete = () => {
+    setShowModal(false); // Close the modal without deleting
+  };
+
   return (
     <View style={styles.taskItem}>
-      {/* Afficher le bouton "Fini" seulement si la tâche n'est pas en cours de modification */}
       {!isEditing && (
         <TouchableOpacity
           onPress={() => onComplete(task.id)}
@@ -46,19 +59,38 @@ const TaskItem = ({ task, onDelete, onComplete, onEdit }) => {
         </Text>
       )}
 
-      {/* Si la tâche est terminée, ne pas afficher l'icône de modification */}
       {!task.completed && (
         <TouchableOpacity onPress={handleEdit} style={styles.iconButton}>
           <FontAwesome name={isEditing ? "save" : "edit"} size={24} color="blue" />
         </TouchableOpacity>
       )}
 
-      {/* Si la tâche n'est pas en train d'être modifiée, afficher le bouton "Supprimer" */}
       {!isEditing && (
-        <TouchableOpacity onPress={() => onDelete(task.id)} style={styles.iconButton}>
+        <TouchableOpacity onPress={handleDeletePress} style={styles.iconButton}>
           <FontAwesome name="trash" size={24} color="red" />
         </TouchableOpacity>
       )}
+
+      {/* Modal for delete confirmation */}
+      <Modal
+        transparent={true}
+        visible={showModal}
+        animationType="slide"
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Confirmer la suppression de cette tâche</Text>
+            <View style={styles.modalButtons}>
+              <Pressable style={styles.button} onPress={cancelDelete}>
+                <Text style={styles.buttonText}>Annuler</Text>
+              </Pressable>
+              <Pressable style={[styles.button, styles.deleteButton]} onPress={confirmDelete}>
+                <Text style={[styles.buttonText, styles.deleteButtonText]}>Confirmer</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -89,6 +121,46 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     marginLeft: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalText: {
+    marginBottom: 20,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginHorizontal: 10,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  deleteButtonText: {
+    color: 'white',
   },
 });
 
