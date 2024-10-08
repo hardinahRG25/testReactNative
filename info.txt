@@ -1,0 +1,38 @@
+Dans cette application de liste de tâches développée en React Native, plusieurs démarches et un design pattern spécifique ont été appliqués pour garantir une structure de code propre et une gestion efficace des données. Voici un aperçu détaillé de la démarche adoptée et du design pattern utilisé :
+
+Démarche Adoptée
+
+Analyse des besoins :
+
+L'application vise à permettre à l'utilisateur de gérer ses tâches, y compris l'ajout, la suppression, l'édition, et le suivi de l'état d'achèvement des tâches.
+L'ajout de fonctionnalités telles que le filtrage et la recherche a également été pris en compte.
+Structuration du code :
+
+Le code a été organisé en composants fonctionnels séparés (par exemple, TaskContainer, TaskList, TaskItem), permettant ainsi une meilleure lisibilité et maintenabilité.
+Chaque composant a une responsabilité bien définie, ce qui facilite les modifications et les tests.
+
+Gestion de l'état :
+
+Utilisation de hooks React (useState) pour gérer l'état local des tâches et des interactions utilisateur.
+Les modifications d'état, comme l'ajout ou la suppression de tâches, sont effectuées de manière immuable pour éviter les effets secondaires inattendus.
+
+Conception de l'interface utilisateur :
+
+Utilisation de FlatList pour afficher les tâches de manière performante, surtout lorsque le nombre de tâches augmente.
+Création de boutons et d'icônes claires pour faciliter l'interaction avec l'utilisateur.
+
+Design Pattern Utilisé
+Le design pattern principal utilisé dans cette application est le Pattern Container-Presentational Pattern.
+
+Conteneur (Container) :
+
+Le composant TaskContainer agit en tant que conteneur, gérant la logique métier, l'état des tâches, et les interactions avec les composants enfants.
+Il récupère les données, gère les actions de l'utilisateur (ajout, suppression, édition), et les transmet aux composants de présentation.
+
+Présentation (Presentational) :
+
+Les composants comme TaskList et TaskItem se concentrent sur l'affichage des données reçues. Ils ne gèrent pas l'état de manière indépendante mais se contentent de recevoir des props et de rendre l'interface.
+Cela sépare les préoccupations entre la logique de l'application (gérée par le conteneur) et la présentation visuelle, ce qui facilite la maintenance et les tests.
+
+Conclusion
+Cette démarche de développement, combinée avec le design pattern, permet d'assurer une architecture claire et modulaire, ce qui est essentiel pour le développement d'applications complexes. L'application est facilement extensible, permettant d'ajouter de nouvelles fonctionnalités à l'avenir sans refactoriser complètement le code existant.
