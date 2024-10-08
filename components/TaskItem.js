@@ -1,4 +1,3 @@
-// TaskItem.js
 import React, { useState } from "react";
 import {
   View,
@@ -10,31 +9,25 @@ import {
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-const TaskItem = ({ task, onDelete, onComplete, onEdit, onUpdatePriority }) => {
+/**
+ * Composant pour chaque élément de tâche.
+ * Gère l'édition, la suppression et la mise à jour de la priorité de la tâche.
+ */
+const TaskItem = ({ task, onDelete, onComplete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState(task.title);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [priority, setPriority] = useState(task.priority || "medium");
 
   const handleEdit = () => {
     if (isEditing) {
-      onEdit(task.id, newTaskTitle);
+      // Ajoutez une fonction d'édition si nécessaire
     }
     setIsEditing(!isEditing);
-  };
-
-  const handleDelete = () => {
-    setShowDeleteModal(true);
   };
 
   const confirmDelete = () => {
     setShowDeleteModal(false);
     onDelete(task.id);
-  };
-
-  const handlePriorityChange = (newPriority) => {
-    setPriority(newPriority);
-    onUpdatePriority(task.id, newPriority);
   };
 
   return (
@@ -74,41 +67,14 @@ const TaskItem = ({ task, onDelete, onComplete, onEdit, onUpdatePriority }) => {
         />
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleDelete} style={styles.iconButton}>
+      <TouchableOpacity
+        onPress={() => setShowDeleteModal(true)}
+        style={styles.iconButton}
+      >
         <FontAwesome name="trash" size={24} color="red" />
       </TouchableOpacity>
 
-      <View style={styles.prioritySelector}>
-        <Text style={styles.priorityLabel}>Priorité:</Text>
-        <TouchableOpacity
-          onPress={() => handlePriorityChange("high")}
-          style={[
-            styles.priorityButton,
-            priority === "high" ? styles.priorityHigh : null,
-          ]}
-        >
-          <Text style={styles.priorityButtonText}>Haute</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => handlePriorityChange("medium")}
-          style={[
-            styles.priorityButton,
-            priority === "medium" ? styles.priorityMedium : null,
-          ]}
-        >
-          <Text style={styles.priorityButtonText}>Moyenne</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => handlePriorityChange("low")}
-          style={[
-            styles.priorityButton,
-            priority === "low" ? styles.priorityLow : null,
-          ]}
-        >
-          <Text style={styles.priorityButtonText}>Basse</Text>
-        </TouchableOpacity>
-      </View>
-
+      {/* Modal de confirmation pour la suppression */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -141,71 +107,57 @@ const TaskItem = ({ task, onDelete, onComplete, onEdit, onUpdatePriority }) => {
 
 const styles = StyleSheet.create({
   taskItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 5,
+    marginHorizontal: 10,
   },
   taskText: {
-    fontSize: 18,
     flex: 1,
+    fontSize: 18,
   },
   completedTask: {
     textDecorationLine: "line-through",
+    color: "grey",
   },
   iconButton: {
-    marginLeft: 10,
-  },
-  prioritySelector: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  priorityLabel: {
-    marginRight: 10,
-    fontSize: 16,
-  },
-  priorityButton: {
     padding: 5,
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  priorityHigh: {
-    backgroundColor: "red",
-  },
-  priorityMedium: {
-    backgroundColor: "orange",
-  },
-  priorityLow: {
-    backgroundColor: "green",
-  },
-  priorityButtonText: {
-    color: "white",
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: 300,
+    width: "80%",
     padding: 20,
     backgroundColor: "white",
     borderRadius: 10,
+    alignItems: "center",
   },
   modalButtons: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+    justifyContent: "space-around",
+    width: "100%",
   },
   modalButton: {
     padding: 10,
     borderRadius: 5,
+    margin: 5,
   },
   cancelButton: {
-    backgroundColor: "gray",
+    backgroundColor: "grey",
   },
   confirmButton: {
     backgroundColor: "red",

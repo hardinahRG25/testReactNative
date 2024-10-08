@@ -1,44 +1,38 @@
-// TaskContainer.js
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Button } from "react-native";
 import TaskList from "./TaskList";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Toast from "react-native-toast-message";
+import TaskInput from "./TaskInput"; // Nouveau composant pour ajouter des tâches
 
+/**
+ * Composant pour gérer les tâches.
+ * Contient la logique pour ajouter, supprimer, modifier et trier les tâches.
+ */
 const TaskContainer = () => {
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState("");
+  const [filter, setFilter] = useState("all"); // Filtre pour les tâches
 
-  const addTask = () => {
-    if (!newTask.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Erreur",
-        text2: "Veuillez entrer une tâche avant d'ajouter.",
-      });
-      return;
-    }
-
-    const newTaskItem = {
-      id: tasks.length + 1,
-      title: newTask,
-      completed: false,
-      priority: "medium", // Priorité par défaut
-    };
-    setTasks([...tasks, newTaskItem]);
-    setNewTask("");
+  // Fonction pour ajouter une nouvelle tâche
+  const addTask = (task) => {
+    setTasks([...tasks, task]);
+    Toast.show({
+      type: "success",
+      text1: "Succès",
+      text2: "Tâche ajoutée avec succès !",
+    });
   };
 
+  // Fonction pour supprimer une tâche
   const deleteTask = (taskId) => {
     setTasks(tasks.filter((task) => task.id !== taskId));
+    Toast.show({
+      type: "success",
+      text1: "Succès",
+      text2: "Tâche supprimée avec succès !",
+    });
   };
 
+  // Fonction pour compléter une tâche
   const completeTask = (taskId) => {
     setTasks(
       tasks.map((task) =>
@@ -47,108 +41,47 @@ const TaskContainer = () => {
     );
   };
 
-  const editTask = (taskId, newTitle) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, title: newTitle } : task
-      )
-    );
-  };
-
-  const updateTaskPriority = (taskId, newPriority) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, priority: newPriority } : task
-      )
-    );
-  };
-
-  const sortTasksByPriority = () => {
-    const sortedTasks = [...tasks].sort((a, b) => {
-      const priorityLevels = { low: 1, medium: 2, high: 3 };
-      return priorityLevels[b.priority] - priorityLevels[a.priority]; // Tri décroissant
+  // Fonction pour trier les tâches par priorité
+  const sortedTasks = () => {
+    return tasks.sort((a, b) => {
+      const priorityOrder = { high: 1, medium: 2, low: 3 };
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
     });
-    setTasks(sortedTasks);
+  };
+
+  // Fonction pour filtrer les tâches
+  const filteredTasks = () => {
+    if (filter === "completed") {
+      return tasks.filter((task) => task.completed);
+    } else if (filter === "incomplete") {
+      return tasks.filter((task) => !task.completed);
+    }
+    return tasks; // Retourne toutes les tâches
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Todo List</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ajouter une tâche ici"
-        value={newTask}
-        onChangeText={setNewTask}
-      />
-      <TouchableOpacity onPress={addTask} style={styles.addButton}>
-        <FontAwesome name="plus" size={24} color="white" />
-        <Text style={styles.addButtonText}>Ajouter</Text>
-      </TouchableOpacity>
+    <View>
+      {/* Système de filtrage des tâches */}
+      <View>
+        <Button title="Toutes" onPress={() => setFilter("all")} />
+        <Button title="Complètes" onPress={() => setFilter("completed")} />
+        <Button title="Incomplètes" onPress={() => setFilter("incomplete")} />
+      </View>
 
-      {/* Bouton pour trier les tâches */}
-      <TouchableOpacity onPress={sortTasksByPriority} style={styles.sortButton}>
-        <Text style={styles.sortButtonText}>Trier par priorité</Text>
-      </TouchableOpacity>
+      {/* Champ d'entrée pour ajouter des tâches */}
+      <TaskInput onAddTask={addTask} />
 
-      {/* Liste des tâches */}
+      {/* Liste des tâches filtrées et triées */}
       <TaskList
-        tasks={tasks}
-        onDelete={deleteTask}
+        tasks={filteredTasks()}
         onToggleComplete={completeTask}
-        onEdit={editTask}
-        onUpdatePriority={updateTaskPriority}
+        onDelete={deleteTask}
       />
 
-      {/* Toast pour la notification */}
+      {/* Toast pour les notifications */}
       <Toast ref={(ref) => Toast.setRef(ref)} />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#f0f8ff",
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#333",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-    fontSize: 18,
-  },
-  addButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#007BFF",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 20,
-  },
-  addButtonText: {
-    color: "white",
-    marginLeft: 10,
-    fontSize: 18,
-  },
-  sortButton: {
-    backgroundColor: "#28a745",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  sortButtonText: {
-    color: "white",
-    fontSize: 16,
-    textAlign: "center",
-  },
-});
 
 export default TaskContainer;

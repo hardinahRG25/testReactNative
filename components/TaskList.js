@@ -1,15 +1,12 @@
-// TaskList.js
 import React from "react";
 import { FlatList } from "react-native";
 import TaskItem from "./TaskItem";
 
-const TaskList = ({
-  tasks,
-  onToggleComplete,
-  onDelete,
-  onEdit,
-  onUpdatePriority,
-}) => {
+/**
+ * Composant pour afficher la liste des tâches.
+ * Utilise FlatList pour un rendu efficace.
+ */
+const TaskList = ({ tasks, onToggleComplete, onDelete }) => {
   return (
     <FlatList
       data={tasks}
@@ -19,8 +16,6 @@ const TaskList = ({
           task={item}
           onToggleComplete={onToggleComplete}
           onDelete={onDelete}
-          onEdit={onEdit}
-          onUpdatePriority={onUpdatePriority}
         />
       )}
     />
