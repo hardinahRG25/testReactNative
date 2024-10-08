@@ -15,16 +15,16 @@ const TaskItem = ({ task, onDelete, onComplete, onEdit }) => {
   };
 
   const handleDeletePress = () => {
-    setShowModal(true); // Show the modal
+    setShowModal(true);
   };
 
   const confirmDelete = () => {
-    setShowModal(false); // Close the modal
-    onDelete(task.id); // Delete the task
+    setShowModal(false);
+    onDelete(task.id);
   };
 
   const cancelDelete = () => {
-    setShowModal(false); // Close the modal without deleting
+    setShowModal(false);
   };
 
   return (
@@ -71,7 +71,7 @@ const TaskItem = ({ task, onDelete, onComplete, onEdit }) => {
         </TouchableOpacity>
       )}
 
-      {/* Modal for delete confirmation */}
+      
       <Modal
         transparent={true}
         visible={showModal}
