@@ -30,6 +30,12 @@ TaskList.js : Composant de présentation de la liste de tâches.
 ## Prérequis
 Version de node utilisé pour ce test : v20.10.0
 
+Installer Expo CLI globalement si ce n'est pas déjà fait:
+```bash
+npm install -g expo-cli
+```
+
+
 ## Installation
 
 ```bash
@@ -43,6 +49,10 @@ npm install
 ```bash
 npx expo start
 ```
+
+## API
+Cette application utilise l'API [jsonplaceholder](https://jsonplaceholder.typicode.com/) pour les requêtes fictives.
+
 
 ## illustration
 
