@@ -1,3 +1,4 @@
+// App.js
 import React from "react";
 import { SafeAreaView } from "react-native";
 import TaskContainer from "./containers/TaskContainer";

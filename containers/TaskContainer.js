@@ -1,266 +1,153 @@
-import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TextInput, TouchableOpacity, Text } from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import TaskItem from '../components/TaskItem';
-import axios from 'axios';
+// TaskContainer.js
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import TaskList from "./TaskList";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Toast from "react-native-toast-message";
 
 const TaskContainer = () => {
   const [tasks, setTasks] = useState([]);
-  const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showCompleted, setShowCompleted] = useState(true);
-  const [sortOrder, setSortOrder] = useState(null);
-  const [showMenu, setShowMenu] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    axios
-      .get('https://jsonplaceholder.typicode.com/todos?_limit=10')
-      .then((response) => {
-        const tasksWithDate = response.data.map((task) => ({
-          ...task,
-          createdAt: new Date(),
-        }));
-        setTasks(tasksWithDate);
-      })
-      .catch((error) => console.error(error));
-  }, []);
+  const [newTask, setNewTask] = useState("");
 
   const addTask = () => {
-    if (newTaskTitle.trim() !== '') {
-      const newTask = {
-        id: Math.random().toString(),
-        title: newTaskTitle,
-        completed: false,
-        createdAt: new Date(),
-      };
-      setTasks([...tasks, newTask]);
-      setNewTaskTitle('');
+    if (!newTask.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Erreur",
+        text2: "Veuillez entrer une tâche avant d'ajouter.",
+      });
+      return;
     }
+
+    const newTaskItem = {
+      id: tasks.length + 1,
+      title: newTask,
+      completed: false,
+      priority: "medium", // Priorité par défaut
+    };
+    setTasks([...tasks, newTaskItem]);
+    setNewTask("");
   };
 
-  const deleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
+  const deleteTask = (taskId) => {
+    setTasks(tasks.filter((task) => task.id !== taskId));
   };
 
-  const completeTask = (id) => {
+  const completeTask = (taskId) => {
     setTasks(
       tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
+        task.id === taskId ? { ...task, completed: !task.completed } : task
       )
     );
   };
 
-  const editTask = (id, newTitle) => {
+  const editTask = (taskId, newTitle) => {
     setTasks(
-      tasks.map((task) => (task.id === id ? { ...task, title: newTitle } : task))
+      tasks.map((task) =>
+        task.id === taskId ? { ...task, title: newTitle } : task
+      )
     );
   };
 
-  let filteredTasks = tasks.filter((task) =>
-    task.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const updateTaskPriority = (taskId, newPriority) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === taskId ? { ...task, priority: newPriority } : task
+      )
+    );
+  };
 
-  if (!showCompleted) {
-    filteredTasks = filteredTasks.filter((task) => !task.completed);
-  }
-
-  const sortTasks = (tasksList, order) => {
-    return tasksList.slice().sort((a, b) => {
-      if (order === 'asc') {
-        return a.createdAt - b.createdAt;
-      } else if (order === 'desc') {
-        return b.createdAt - a.createdAt;
-      }
-      return 0;
+  const sortTasksByPriority = () => {
+    const sortedTasks = [...tasks].sort((a, b) => {
+      const priorityLevels = { low: 1, medium: 2, high: 3 };
+      return priorityLevels[b.priority] - priorityLevels[a.priority]; // Tri décroissant
     });
-  };
-
-  if (sortOrder) {
-    filteredTasks = sortTasks(filteredTasks, sortOrder);
-  }
-
-  const toggleMenu = () => {
-    setShowMenu(!showMenu);
-  };
-
-  const toggleSortOrder = () => {
-    setSortOrder((prevOrder) => (prevOrder === 'asc' ? 'desc' : 'asc'));
-  };
-
-  const handleMenuSelection = () => {
-    setShowCompleted(!showCompleted);
-    setShowMenu(false);
-  };
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+    setTasks(sortedTasks);
   };
 
   return (
-    <View style={[styles.container, darkMode ? styles.containerDark : styles.containerLight]}>
-      <Text style={[styles.header, darkMode ? styles.headerDark : styles.headerLight]}>
-        Todo List
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.header}>Todo List</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Ajouter une tâche ici"
+        value={newTask}
+        onChangeText={setNewTask}
+      />
+      <TouchableOpacity onPress={addTask} style={styles.addButton}>
+        <FontAwesome name="plus" size={24} color="white" />
+        <Text style={styles.addButtonText}>Ajouter</Text>
+      </TouchableOpacity>
 
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={[styles.input, darkMode ? styles.inputDark : styles.inputLight]}
-          placeholder="Rechercher une tâche"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
-          <FontAwesome name="ellipsis-v" size={24} color={darkMode ? "#ECF0F1" : "#007BFF"} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButton}>
-          <FontAwesome
-            name={sortOrder === 'asc' ? 'sort-amount-asc' : 'sort-amount-desc'}
-            size={24}
-            color={darkMode ? "#ECF0F1" : "#007BFF"}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={toggleDarkMode} style={styles.darkModeButton}>
-          <FontAwesome name={darkMode ? "sun-o" : "moon-o"} size={24} color={darkMode ? "#ECF0F1" : "#007BFF"} />
-        </TouchableOpacity>
-      </View>
+      {/* Bouton pour trier les tâches */}
+      <TouchableOpacity onPress={sortTasksByPriority} style={styles.sortButton}>
+        <Text style={styles.sortButtonText}>Trier par priorité</Text>
+      </TouchableOpacity>
 
-      {showMenu && (
-        <View style={styles.menu}>
-          <TouchableOpacity
-            onPress={handleMenuSelection}
-            style={styles.menuItem}
-          >
-            <Text style={[styles.menuText, darkMode ? styles.menuTextDark : styles.menuTextLight]}>
-              {showCompleted ? 'Masquer' : 'Afficher'} les tâches terminées
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <FlatList
-        data={filteredTasks}
-        renderItem={({ item }) => (
-          <TaskItem
-            task={item}
-            onDelete={deleteTask}
-            onComplete={completeTask}
-            onEdit={editTask}
-            darkMode={darkMode}
-          />
-        )}
-        keyExtractor={(item) => item.id.toString()}
-        style={styles.taskList}
+      {/* Liste des tâches */}
+      <TaskList
+        tasks={tasks}
+        onDelete={deleteTask}
+        onToggleComplete={completeTask}
+        onEdit={editTask}
+        onUpdatePriority={updateTaskPriority}
       />
 
-      <View style={styles.addTaskContainer}>
-        <TextInput
-          style={[styles.input, darkMode ? styles.inputDark : styles.inputLight]}
-          placeholder="Ajouter une nouvelle tâche"
-          value={newTaskTitle}
-          onChangeText={setNewTaskTitle}
-        />
-        <TouchableOpacity onPress={addTask} style={styles.addButton}>
-          <FontAwesome name="plus" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
+      {/* Toast pour la notification */}
+      <Toast ref={(ref) => Toast.setRef(ref)} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
-    paddingVertical: 80,
     flex: 1,
-  },
-  containerLight: {
-    backgroundColor: '#E9F7EF',
-  },
-  containerDark: {
-    backgroundColor: '#b2c5d8',
+    padding: 20,
+    backgroundColor: "#f0f8ff",
   },
   header: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  headerLight: {
-    color: '#2C3E50',
-  },
-  headerDark: {
-    color: '#ECF0F1',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
   },
   input: {
-    height: 40,
     borderWidth: 1,
-    paddingHorizontal: 10,
-    flex: 1,
+    borderColor: "#ccc",
     borderRadius: 5,
-  },
-  inputLight: {
-    borderColor: '#007BFF',
-    backgroundColor: 'white',
-  },
-  inputDark: {
-    borderColor: '#ECF0F1',
-    backgroundColor: 'white',
-    color: '#ECF0F1',
-  },
-  menuButton: {
-    marginLeft: 10,
-  },
-  sortButton: {
-    marginLeft: 10,
-  },
-  darkModeButton: {
-    marginLeft: 10,
-  },
-  menu: {
-    backgroundColor: 'white',
-    position: 'absolute',
-    top: 70,
-    right: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    zIndex: 999,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-  },
-  menuItem: {
     padding: 10,
-  },
-  menuText: {
-    color: '#007BFF',
-  },
-  menuTextLight: {
-    color: '#007BFF',
-  },
-  menuTextDark: {
-    color: '#ECF0F1',
-  },
-  taskList: {
-    flex: 1,
-  },
-  addTaskContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
+    marginBottom: 10,
+    fontSize: 18,
   },
   addButton: {
-    backgroundColor: '#007BFF',
-    borderRadius: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#007BFF",
     padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  addButtonText: {
+    color: "white",
     marginLeft: 10,
+    fontSize: 18,
+  },
+  sortButton: {
+    backgroundColor: "#28a745",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  sortButtonText: {
+    color: "white",
+    fontSize: 16,
+    textAlign: "center",
   },
 });
 

@@ -1,8 +1,15 @@
+// TaskList.js
 import React from "react";
 import { FlatList } from "react-native";
 import TaskItem from "./TaskItem";
 
-const TaskList = ({ tasks, onToggleComplete, onDelete }) => {
+const TaskList = ({
+  tasks,
+  onToggleComplete,
+  onDelete,
+  onEdit,
+  onUpdatePriority,
+}) => {
   return (
     <FlatList
       data={tasks}
@@ -12,6 +19,8 @@ const TaskList = ({ tasks, onToggleComplete, onDelete }) => {
           task={item}
           onToggleComplete={onToggleComplete}
           onDelete={onDelete}
+          onEdit={onEdit}
+          onUpdatePriority={onUpdatePriority}
         />
       )}
     />
