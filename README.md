@@ -27,6 +27,9 @@ TaskContainer.js : Gère la logique métier (état, appels API, gestion des tâc
 TaskItem.js : Composant de présentation d'une tâche individuelle.
 TaskList.js : Composant de présentation de la liste de tâches.
 
+## Prérequis
+Version de node utilisé pour ce test : v20.10.0
+
 ## Installation
 
 ```bash
