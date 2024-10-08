@@ -8,50 +8,49 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Toast from "react-native-toast-message";
 
-const TaskItem = ({ task, onDelete, onComplete, onEdit }) => {
+const TaskItem = ({ task, onDelete, onComplete, onEdit, onUpdatePriority }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState(task.title);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [priority, setPriority] = useState(task.priority || "medium"); // État pour la priorité
 
-  // Fonction pour gérer l'édition de la tâche
   const handleEdit = () => {
     if (isEditing) {
-      // Si l'on est en mode édition, sauvegarde les modifications
       onEdit(task.id, newTaskTitle);
     }
     setIsEditing(!isEditing);
   };
 
-  // Fonction pour afficher le modal de confirmation de suppression
   const handleDelete = () => {
     setShowDeleteModal(true);
   };
 
-  // Fonction pour confirmer la suppression de la tâche
   const confirmDelete = () => {
     setShowDeleteModal(false);
     onDelete(task.id);
   };
 
+  const handlePriorityChange = (newPriority) => {
+    setPriority(newPriority);
+    onUpdatePriority(task.id, newPriority); // Mise à jour de la priorité
+  };
+
   return (
     <View style={styles.taskItem}>
-      {/* Bouton pour marquer la tâche comme complétée */}
       <TouchableOpacity
         onPress={() => onComplete(task.id)}
         style={styles.iconButton}
       >
-        {/* Changement de l'icône selon si la tâche est complétée ou non */}
         <FontAwesome
           name={task.completed ? "check-circle" : "circle"}
           size={24}
           color="green"
         />
       </TouchableOpacity>
-
-      {/* Si on est en mode édition, afficher un champ de texte, sinon afficher le texte de la tâche */}
       {isEditing ? (
         <TextInput
           style={styles.input}
@@ -62,29 +61,58 @@ const TaskItem = ({ task, onDelete, onComplete, onEdit }) => {
         <Text
           style={[
             styles.taskText,
-            task.completed ? styles.completedTask : null, // Si la tâche est complétée, barrer le texte
+            task.completed ? styles.completedTask : null,
           ]}
         >
           {task.title}
         </Text>
       )}
 
-      {/* Bouton pour éditer ou sauvegarder les modifications */}
       <TouchableOpacity onPress={handleEdit} style={styles.iconButton}>
         <FontAwesome
-          name={isEditing ? "save" : "edit"} // Alterner entre "éditer" et "sauvegarder"
+          name={isEditing ? "save" : "edit"}
           size={24}
-          color={isEditing ? "white" : "blue"} // Changer la couleur de l'icône selon l'état
+          color={isEditing ? "white" : "blue"}
         />
       </TouchableOpacity>
 
-      {/* Bouton pour supprimer la tâche */}
       <TouchableOpacity onPress={handleDelete} style={styles.iconButton}>
-        <FontAwesome name="trash" size={24} color="red" />{" "}
-        {/* Icône de poubelle */}
+        <FontAwesome name="trash" size={24} color="red" />
       </TouchableOpacity>
 
-      {/* Modal de confirmation de suppression */}
+      {/* Sélecteur de priorité */}
+      <View style={styles.prioritySelector}>
+        <Text style={styles.priorityLabel}>Priorité:</Text>
+        <TouchableOpacity
+          onPress={() => handlePriorityChange("high")}
+          style={[
+            styles.priorityButton,
+            priority === "high" ? styles.priorityHigh : null,
+          ]}
+        >
+          <Text style={styles.priorityButtonText}>Haute</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => handlePriorityChange("medium")}
+          style={[
+            styles.priorityButton,
+            priority === "medium" ? styles.priorityMedium : null,
+          ]}
+        >
+          <Text style={styles.priorityButtonText}>Moyenne</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => handlePriorityChange("low")}
+          style={[
+            styles.priorityButton,
+            priority === "low" ? styles.priorityLow : null,
+          ]}
+        >
+          <Text style={styles.priorityButtonText}>Basse</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Modal de confirmation pour la suppression */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -95,15 +123,12 @@ const TaskItem = ({ task, onDelete, onComplete, onEdit }) => {
           <View style={styles.modalContent}>
             <Text>Êtes-vous sûr de vouloir supprimer cette tâche ?</Text>
             <View style={styles.modalButtons}>
-              {/* Bouton pour annuler la suppression */}
               <TouchableOpacity
                 onPress={() => setShowDeleteModal(false)}
                 style={[styles.modalButton, styles.cancelButton]}
               >
                 <Text style={styles.buttonText}>Annuler</Text>
               </TouchableOpacity>
-
-              {/* Bouton pour confirmer la suppression */}
               <TouchableOpacity
                 onPress={confirmDelete}
                 style={[styles.modalButton, styles.confirmButton]}
@@ -118,14 +143,14 @@ const TaskItem = ({ task, onDelete, onComplete, onEdit }) => {
   );
 };
 
-// Composant principal de l'application
 const App = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [taskDeadline, setTaskDeadline] = useState(new Date());
 
   const addTask = () => {
     if (!newTask.trim()) {
-      // Si l'input est vide ou contient seulement des espaces, afficher une alerte
       Toast.show({
         type: "error",
         text1: "Erreur",
@@ -138,6 +163,8 @@ const App = () => {
       id: tasks.length + 1,
       title: newTask,
       completed: false,
+      priority: "medium", // Priorité par défaut
+      deadline: taskDeadline, // Date limite
     };
     setTasks([...tasks, newTaskItem]);
     setNewTask("");
@@ -163,22 +190,45 @@ const App = () => {
     );
   };
 
+  const updateTaskPriority = (taskId, newPriority) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === taskId ? { ...task, priority: newPriority } : task
+      )
+    );
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    setTaskDeadline(selectedDate || taskDeadline);
+    setShowDatePicker(false);
+  };
+
   return (
     <View style={styles.container}>
-      {/* En-tête de l'application */}
       <Text style={styles.header}>Todo List</Text>
-
-      {/* Input pour ajouter une nouvelle tâche */}
       <TextInput
         style={styles.input}
         placeholder="Ajouter une tâche ici"
         value={newTask}
         onChangeText={setNewTask}
       />
+      <TouchableOpacity
+        onPress={() => setShowDatePicker(true)}
+        style={styles.dateButton}
+      >
+        <Text style={styles.dateButtonText}>Choisir une deadline</Text>
+      </TouchableOpacity>
+      {showDatePicker && (
+        <DateTimePicker
+          value={taskDeadline}
+          mode="date"
+          display="default"
+          onChange={onDateChange}
+        />
+      )}
 
-      {/* Bouton pour ajouter une tâche */}
       <TouchableOpacity onPress={addTask} style={styles.addButton}>
-        <FontAwesome name="plus" size={24} color="white" /> {/* Icône "plus" */}
+        <FontAwesome name="plus" size={24} color="white" />
         <Text style={styles.addButtonText}>Ajouter</Text>
       </TouchableOpacity>
 
@@ -190,10 +240,11 @@ const App = () => {
           onDelete={deleteTask}
           onComplete={completeTask}
           onEdit={editTask}
+          onUpdatePriority={updateTaskPriority}
         />
       ))}
 
-      {/* Toast pour afficher des notifications */}
+      {/* Toast pour la notification */}
       <Toast ref={(ref) => Toast.setRef(ref)} />
     </View>
   );
@@ -232,6 +283,16 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 18,
   },
+  dateButton: {
+    backgroundColor: "#007BFF",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  dateButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
   taskItem: {
     padding: 10,
     borderBottomWidth: 1,
@@ -249,6 +310,31 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     marginLeft: 10,
+  },
+  prioritySelector: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  priorityLabel: {
+    marginRight: 10,
+    fontSize: 16,
+  },
+  priorityButton: {
+    padding: 5,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  priorityHigh: {
+    backgroundColor: "red",
+  },
+  priorityMedium: {
+    backgroundColor: "orange",
+  },
+  priorityLow: {
+    backgroundColor: "green",
+  },
+  priorityButtonText: {
+    color: "white",
   },
   modalOverlay: {
     flex: 1,
